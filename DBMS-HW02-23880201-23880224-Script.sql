@@ -45,7 +45,10 @@ where (nl.quan like 'Q1' or
 -- 4) Liệt kê danh sách họ tên và mã độc giả k có bảo lãnh trẻ em
 -- KQ: DocGia (hoten, ma_docgia)
 -- ĐK: k có bảo lãnh trẻ em
-
+select dg.ma_docgia, dg.ho+''+dg.tenlot+' '+dg.ten as "Ho Ten"
+from DocGia dg 
+	left join TreEm t on dg.ma_docgia = t.ma_docgia_nguoilon
+where t.ma_docgia is null
 
 -- 5) Liệt kê danh sách độc giả đang đăng ký mượn sách và tên đầu sách cần mượn
 -- KQ: DocGia, TuaSach (tuasach)
