@@ -53,10 +53,19 @@ where t.ma_docgia is null
 -- 5) Liệt kê danh sách độc giả đang đăng ký mượn sách và tên đầu sách cần mượn
 -- KQ: DocGia, TuaSach (tuasach)
 -- ĐK: độc giả đang đăng ký mượn sách
-
+select dg.*, ts.tusach as "Ten dau sach"
+from DangKy dk
+	join DocGia dg on dk.ma_docgia = dg.ma_docgia
+	join DauSach ds on dk.isbn = ds.isbn
+	join TuaSach ts on ds.ma_tuasach = ts.ma_tuasach
 
 -- 6) Liệt kê danh sách độc giả đang đăng ký mượn sách và số lượng đầu sách đã đăng ký
-
+-- KQ: DocGia, Số lượng sách
+-- ĐK: đang đăng ký mượn sách
+select dg.ma_docgia, dg.ho+''+dg.tenlot+' '+dg.ten as "Ho Ten", count(dk.isbn) as "So luong"
+from DangKy dk
+	join DocGia dg on dk.ma_docgia = dg.ma_docgia
+group by dg.ma_docgia, dg.ho, dg.tenlot, dg.ten
 
 -- 7) Liệt kê danh sách mã isbn và tên đầu sách đang được độc giả đky mượn và đang trong trạng
 -- thái sẵn sàng cho mượn
