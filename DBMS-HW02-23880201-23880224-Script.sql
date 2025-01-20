@@ -69,6 +69,16 @@ group by dg.ma_docgia, dg.ho, dg.tenlot, dg.ten
 
 -- 7) Liệt kê danh sách mã isbn và tên đầu sách đang được độc giả đky mượn và đang trong trạng
 -- thái sẵn sàng cho mượn
-
+-- KQ:
+-- ĐK:
+select dk.isbn, ts.tusach
+from DangKy dk
+	join DauSach ds on dk.isbn = ds.isbn
+	join TuaSach ts on ds.ma_tuasach = ts.ma_tuasach
+where ds.trangthai like 'Y'
 
 -- 8) Với mỗi đầu sách, cho biết số lần đã mượn (và đã trả)
+select ds.isbn, count(qm.isbn) as "So lan da muon"
+from DauSach ds
+	left join QTrinhMuon qm on ds.isbn = qm.isbn
+group by ds.isbn, qm.isbn
