@@ -94,3 +94,82 @@ select ds.isbn,ds.ma_tuasach,ds.ngonngu,ds.bia,ds.trangthai,count(m.isbn) as "Đ
 from DauSach ds left join Muon m on (ds.isbn=m.isbn)
 left join QuaTrinhMuon qtm on (qtm.isbn=ds.isbn)
 group by ds.isbn,ds.ma_tuasach,ds.ngonngu,ds.bia,ds.trangthai
+
+
+-------------------------Bài tập làm thêm--------------------------------
+--Nhóm A
+--5) Liêt kê tất cả họ tên đọc giả người lớn có trong hệ thống và số lượng trẻ em mà họ bảo lãnh (nếu có)
+--KQ: ho ten (docgia,nguoilon),so luong tre em (tre em)
+--DK: 
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+select d.ho,d.tenlot,d.ten,count(te.ma_docgia) as 'số lượng trẻ em bảo lãnh'
+from DocGia d join NguoiLon l on d.ma_docgia=l.ma_docgia
+left join TreEm te on te.ma_docgia_nguoilon=l.ma_docgia
+group by d.ho,d.tenlot,d.ten
+
+
+ --6) Liệt kê thông tin các đầu sách vẫn còn khả năng được mượn
+ --KQ: DauSach
+ --DK: Vẫn còn khả năng được mượn
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+ select *
+ from DauSach ds 
+ where ds.trangthai='Y'
+
+ --7)  Với mỗi đầu sách, liệt kê thông tin đầu sách và số lượng cuốn sách vẫn còn trong thư viện
+ --KQ: thông tin đầu sách (dauSach) và số lương cuốn sách (cuonSach)
+ --DK: cuốn sách vẫn còn trong thư viện
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+ select ds.isbn,ds.ma_tuasach,ds.ngonngu,ds.bia,ds.trangthai,count(cs.Ma_CuonSach) as 'Số lượng'
+ from DauSach ds join CuonSach cs on ds.isbn=cs.isbn
+ where cs.TinhTrang='Y'
+ group by ds.isbn,ds.ma_tuasach,ds.ngonngu,ds.bia,ds.trangthai\
+
+ --8) Với từng ngôn ngữ sách có trong hệ thống, cho biết tên ngôn ngữ và số lượng đầu sách thuộc ngôn ngữ đó
+ --KQ: tên ngôn ngữ, số lương đầu sách (DauSach)
+ --ĐK: 
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+ select ds.ngonngu,count(ds.isbn)
+ from DauSach ds
+ group by ds.ngonngu
+
+--Nhóm B
+--1) Liệt kê danh sách họ tên và mã độc giả người lớn đang mượn sách chưa trả và số lượng sách họ đang mượn
+--KQ: ho ten và ma_docgia (DocGia), số lượng sách (Muon)
+--DK: người lớn và đang mượn sách chưa trả 
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+select d.ho, d.ten, count(d.ma_docgia) as "Số lượng sách mượn"
+from DocGia d join NguoiLon l on (d.ma_docgia=l.ma_docgia)
+join Muon m on(d.ma_docgia=m.ma_docgia)
+group by d.ho,d.ten,d.ma_docgia
+
+--2) Liệt kê danh sách họ tên và mã độc giả người lớn đang mượn sách trễ hạn (so với quy định)
+--KQ: ho ten và ma_docgia (DocGia)
+--DK: người lớn và đang mượn sách trễ hạn 
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+select distinct d.ho, d.ten,  d.ma_docgia
+from DocGia d join NguoiLon l on (d.ma_docgia=l.ma_docgia)
+join Muon m on(d.ma_docgia=m.ma_docgia)
+where GETDATE() > m.ngay_hethan
+
+--3) Liệt kê danh sách họ tên đọc giả trẻ em đang mượn sách chưa trả và tên đầu sách mà trẻ em đang mượn
+--KQ: ho ten và ma_docgia (DocGia)
+--DK: người trẻ em và đang mượn sách chưa trả (Muon) và tên đầu sách mà trẻ em đang mượn (TuaSach)
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+select d.ho, d.ten,ts.TuaSach 
+from DocGia d join TreEm te on (d.ma_docgia=te.ma_docgia)
+join Muon m on (d.ma_docgia=m.ma_docgia)
+join CuonSach cs on (cs.Ma_CuonSach=m.ma_cuonsach)
+join DauSach ds on (ds.isbn=cs.isbn)
+join TuaSach ts on (ts.ma_tuasach=ds.ma_tuasach)
+
+--4) Liệt kê danh sách các độc giả người lớn đang mượn sách chưa trả 
+--đồng thời trẻ em mà người lớn đó đang bảo lãnh cũng có mượn sách chưa trả.
+--KQ: ho ten và ma_docgia (DocGia)
+--DK: người lớn và đang mượn sách chưa trả, đồng thời trẻ em mà người lớn đó đang bảo lãnh cũng có mượn sách chưa trả.
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+select distinct d.ho,d.ten,d.ma_docgia
+from DocGia d join NguoiLon l on (d.ma_docgia=l.ma_docgia)
+join Muon m on(l.ma_docgia=m.ma_docgia)
+join TreEm te on (l.ma_docgia=te.ma_docgia_nguoilon)
+join Muon m2 on (te.ma_docgia=m2.ma_docgia)
