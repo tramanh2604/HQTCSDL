@@ -45,40 +45,52 @@ where (nl.quan like 'Q1' or
 -- 4) Liệt kê danh sách họ tên và mã độc giả k có bảo lãnh trẻ em
 -- KQ: DocGia (hoten, ma_docgia)
 -- ĐK: k có bảo lãnh trẻ em
-select dg.ma_docgia, dg.ho+''+dg.tenlot+' '+dg.ten as "Ho Ten"
-from DocGia dg 
-	left join TreEm t on dg.ma_docgia = t.ma_docgia_nguoilon
-where t.ma_docgia is null
+select *
+from DocGia d join NguoiLon l on d.ma_docgia=l.ma_docgia
+left join TreEm te on te.ma_docgia_nguoilon=d.ma_docgia
+where te.ma_docgia is null
 
--- 5) Liệt kê danh sách độc giả đang đăng ký mượn sách và tên đầu sách cần mượn
--- KQ: DocGia, TuaSach (tuasach)
--- ĐK: độc giả đang đăng ký mượn sách
-select dg.*, ts.tusach as "Ten dau sach"
-from DangKy dk
-	join DocGia dg on dk.ma_docgia = dg.ma_docgia
-	join DauSach ds on dk.isbn = ds.isbn
-	join TuaSach ts on ds.ma_tuasach = ts.ma_tuasach
+select *
+from DocGia d
+where d.ma_docgia in (
+	select l.ma_docgia
+	from NguoiLon l
+	except
+	select l2.ma_docgia
+	from TreEm te 
+		join NguoiLon l2 on te.ma_docgia_nguoilon=l2.ma_docgia)
 
--- 6) Liệt kê danh sách độc giả đang đăng ký mượn sách và số lượng đầu sách đã đăng ký
--- KQ: DocGia, Số lượng sách
--- ĐK: đang đăng ký mượn sách
-select dg.ma_docgia, dg.ho+''+dg.tenlot+' '+dg.ten as "Ho Ten", count(dk.isbn) as "So luong"
-from DangKy dk
-	join DocGia dg on dk.ma_docgia = dg.ma_docgia
-group by dg.ma_docgia, dg.ho, dg.tenlot, dg.ten
+--5) Liệt kê danh sách độc giả đang đăng ký mượn sách và tên đầu sách cần mượn
+--KQ: ho ten và ma_docgia (DocGia), tên đầu sách (TuaSach)
+--DK: đang đăng ký mượn sách
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+select d.ho,d.ten,d.ma_docgia,ts.TuaSach
+from DocGia d join DangKy dk on (d.ma_docgia=dk.ma_docgia)
+join DauSach ds on (ds.isbn=dk.isbn)
+join TuaSach ts on (ts.ma_tuasach=ds.ma_tuasach)
 
--- 7) Liệt kê danh sách mã isbn và tên đầu sách đang được độc giả đky mượn và đang trong trạng
--- thái sẵn sàng cho mượn
--- KQ:
--- ĐK:
-select dk.isbn, ts.tusach
-from DangKy dk
-	join DauSach ds on dk.isbn = ds.isbn
-	join TuaSach ts on ds.ma_tuasach = ts.ma_tuasach
-where ds.trangthai like 'Y'
+--6) Liệt kê danh sách độc giả đang đăng ký mượn sách và số lượng đầu sách đã đăng ký.
+--KQ: ho ten và ma_docgia (DocGia), số lượng đầu sách đã đăng ký
+--DK: đang đăng ký mượn sách
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+select d.ho,d.ten,d.ma_docgia, count(dk.isbn)
+from DocGia d join DangKy dk on (d.ma_docgia=dk.ma_docgia)
+group by d.ho,d.ten,d.ma_docgia
 
--- 8) Với mỗi đầu sách, cho biết số lần đã mượn (và đã trả)
-select ds.isbn, count(qm.isbn) as "So lan da muon"
-from DauSach ds
-	left join QTrinhMuon qm on ds.isbn = qm.isbn
-group by ds.isbn, qm.isbn
+--7) Liệt kê danh sách mã isbn và tên đầu sách đang được độc giả đăng ký mượn và đang trong trạng thái sẵn sàng cho mượn
+--KQ: mã isbn (DauSach) và tên đầu sách (TuaSach)
+--DK: đang được độc giả đăng ký mượn và đang trong trạng thái sẵn sàng cho mượn
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+select distinct ds.isbn,ts.TuaSach
+from DauSach ds join TuaSach ts on (ds.ma_tuasach=ts.ma_tuasach)
+join DangKy dk on (dk.isbn=ds.isbn)
+where ds.trangthai='Y'
+
+--8) Với mỗi đầu sách,cho biết số lần đã mượn (và đã trả)
+--KQ:  mỗi đầu sách (DauSach)
+--DK: số lần đã mượn (Muon), số lần đã trả (QuaTrinhMuon)
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
+select ds.isbn,ds.ma_tuasach,ds.ngonngu,ds.bia,ds.trangthai,count(m.isbn) as "Đã mượn", count(qtm.isbn) as "Đã trả"
+from DauSach ds left join Muon m on (ds.isbn=m.isbn)
+left join QuaTrinhMuon qtm on (qtm.isbn=ds.isbn)
+group by ds.isbn,ds.ma_tuasach,ds.ngonngu,ds.bia,ds.trangthai
