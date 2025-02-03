@@ -22,6 +22,7 @@ where ma_docgia >= 25 and ma_docgia <= 88;
 -- KQ: NguoiLon (mã độc giả, họ tên, ngày sinh, đt, hạn sử dụng) 
 -- ĐK: có mã độc giả trong khoảng 25 đến 88
 -- Note: k có ngày sinh vì data NguoiLon k có
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
 select dg.ma_docgia as "MaDocGia Nguoi Lon", dg.ho + ' ' + dg.tenlot + ' ' + dg.ten as "Ho Ten", nl.dienthoai, nl.han_sd
 from NguoiLon nl
 	join DocGia dg on nl.ma_docgia = dg.ma_docgia
@@ -31,6 +32,7 @@ where dg.ma_docgia >= 25 and dg.ma_docgia <= 88;
 -- địa chỉ nhà ở quận 1,6,7,BT,GV
 -- KQ: NguoiLon (hoten), TreEm(hoten)
 -- ĐK: địa chỉ nhà ở quận 1,6,7,BT,GV
+-- Họ tên: Bùi Huỳnh Trâm Anh, MSSV: 23880201
 select dg.ma_docgia, dg.ho+ ' ' +dg.tenlot+ ' '+dg.ten as "Tre Em", dg2.ma_docgia, dg2.ho + ' '+dg2.tenlot+ ' '+dg2.ten as "Nguoi Lon"
 from TreEm t
 	join NguoiLon nl on t.ma_docgia_nguoilon = nl.ma_docgia
@@ -45,6 +47,7 @@ where (nl.quan like 'Q1' or
 -- 4) Liệt kê danh sách họ tên và mã độc giả k có bảo lãnh trẻ em
 -- KQ: DocGia (hoten, ma_docgia)
 -- ĐK: k có bảo lãnh trẻ em
+--Họ tên: Trần Hoàng Hà, MSSV: 23880224
 select *
 from DocGia d join NguoiLon l on d.ma_docgia=l.ma_docgia
 left join TreEm te on te.ma_docgia_nguoilon=d.ma_docgia
@@ -63,7 +66,7 @@ where d.ma_docgia in (
 --5) Liệt kê danh sách độc giả đang đăng ký mượn sách và tên đầu sách cần mượn
 --KQ: ho ten và ma_docgia (DocGia), tên đầu sách (TuaSach)
 --DK: đang đăng ký mượn sách
---Họ tên: Trần Hoàng Hà, MSSV: 23880224
+-- Họ tên: Bùi Huỳnh Trâm Anh, MSSV: 23880201	
 select d.ho,d.ten,d.ma_docgia,ts.TuaSach
 from DocGia d join DangKy dk on (d.ma_docgia=dk.ma_docgia)
 join DauSach ds on (ds.isbn=dk.isbn)
@@ -80,7 +83,7 @@ group by d.ho,d.ten,d.ma_docgia
 --7) Liệt kê danh sách mã isbn và tên đầu sách đang được độc giả đăng ký mượn và đang trong trạng thái sẵn sàng cho mượn
 --KQ: mã isbn (DauSach) và tên đầu sách (TuaSach)
 --DK: đang được độc giả đăng ký mượn và đang trong trạng thái sẵn sàng cho mượn
---Họ tên: Trần Hoàng Hà, MSSV: 23880224
+-- Họ tên: Bùi Huỳnh Trâm Anh, MSSV: 23880201
 select distinct ds.isbn,ts.TuaSach
 from DauSach ds join TuaSach ts on (ds.ma_tuasach=ts.ma_tuasach)
 join DangKy dk on (dk.isbn=ds.isbn)
